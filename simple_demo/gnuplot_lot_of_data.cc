@@ -20,7 +20,7 @@ int main() {
     }
 
     // 设置图像样式
-    fprintf(gnuplotPipe, "set title '大量散点数据'\n");
+    fprintf(gnuplotPipe, "set title 'lot of data'\n");
     fprintf(gnuplotPipe, "set xlabel 'X'\n");
     fprintf(gnuplotPipe, "set ylabel 'Y'\n");
     fprintf(gnuplotPipe, "plot '-' with lines title 'sin(x)'\n");

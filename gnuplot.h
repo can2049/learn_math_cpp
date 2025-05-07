@@ -35,7 +35,10 @@ class GnuplotPipe {
       std::cout << "open gnuplot succeeded." << std::endl;
   }
   inline virtual ~GnuplotPipe() {
-    if (pipe) pclose(pipe);
+    if (pipe) {
+      fflush(pipe);
+      pclose(pipe);
+    }
   }
 
   void sendLine(const std::string &text, bool useBuffer = false) {
