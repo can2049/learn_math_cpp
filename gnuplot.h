@@ -31,9 +31,9 @@ class GnuplotPipe {
     std::cout << "Opening gnuplot... ";
     pipe = popen(persist ? "gnuplot -persist" : "gnuplot", "w");
     if (!pipe)
-      std::cout << "failed!" << std::endl;
+      std::cout << "open gnuplot failed!" << std::endl;
     else
-      std::cout << "succeded." << std::endl;
+      std::cout << "open gnuplot succeeded." << std::endl;
   }
   inline virtual ~GnuplotPipe() {
     if (pipe) pclose(pipe);
@@ -46,6 +46,7 @@ class GnuplotPipe {
     else
       fputs((text + "\n").c_str(), pipe);
   }
+
   void sendEndOfData(unsigned repeatBuffer = 1) {
     if (!pipe) return;
     for (unsigned i = 0; i < repeatBuffer; i++) {
@@ -55,6 +56,7 @@ class GnuplotPipe {
     fflush(pipe);
     buffer.clear();
   }
+
   void sendNewDataBlock() { sendLine("\n", !buffer.empty()); }
 
   void writeBufferToFile(const std::string &fileName) {
@@ -67,6 +69,6 @@ class GnuplotPipe {
   GnuplotPipe(GnuplotPipe const &) = delete;
   void operator=(GnuplotPipe const &) = delete;
 
-  FILE *pipe;
+  FILE *pipe = nullptr;
   std::vector<std::string> buffer;
 };

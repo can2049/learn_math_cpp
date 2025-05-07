@@ -11,12 +11,14 @@ int main() {
   // 打开与 gnuplot 的管道
   FILE *gnuplotPipe = popen("gnuplot -persistent", "w");
   if (!gnuplotPipe) {
-    std::cerr << "无法打开 gnuplot。" << std::endl;
+    std::cerr << "cannot open gnuplot" << std::endl;
     exit(1);
   }
 
   // 设置绘图命令
-  fprintf(gnuplotPipe, "set title '散点图示例'\n");
+  fprintf(gnuplotPipe, "set title 'scatter plot demo'\n");
+  fprintf(gnuplotPipe, "set xlabel 'X-axis'\n");
+  fprintf(gnuplotPipe, "set ylabel 'Y-axis'\n");
   fprintf(gnuplotPipe, "plot '-' with points pointtype 7 title 'Data'\n");
 
   // 写入数据
