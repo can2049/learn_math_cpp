@@ -10,9 +10,6 @@
 #include <random>
 #include <vector>
 
-using namespace std;
-using namespace Eigen;
-
 int main(int argc, char **argv) {
   double ar = 1.0, br = 2.0, cr = 1.0;   // 真实参数值
   double ae = 5.0, be = -5.0, ce = 5.0;  // 估计参数值
@@ -23,7 +20,7 @@ int main(int argc, char **argv) {
   std::mt19937 gen(std::random_device{}());
   std::normal_distribution<> dist(0, w_sigma);
 
-  vector<double> x_data, y_data;  // 数据
+  std::vector<double> x_data, y_data;  // 数据
   for (int i = 0; i < N; i++) {
     double x = 1.0 * i / N;
     x_data.push_back(x);
@@ -34,16 +31,17 @@ int main(int argc, char **argv) {
   int iterations = 100;           // 迭代次数
   double cost = 0, lastCost = 0;  // 本次迭代的cost和上一次迭代的cost
 
-  chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
+  std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
   for (int iter = 0; iter < iterations; iter++) {
-    Matrix3d H = Matrix3d::Zero();  // Hessian = J^T W^{-1} J in Gauss-Newton
-    Vector3d b = Vector3d::Zero();  // bias
+    Eigen::Matrix3d H =
+        Eigen::Matrix3d::Zero();  // Hessian = J^T W^{-1} J in Gauss-Newton
+    Eigen::Vector3d b = Eigen::Vector3d::Zero();  // bias
     cost = 0;
 
     for (int i = 0; i < N; i++) {
       double xi = x_data[i], yi = y_data[i];  // 第i个数据点
       double error = yi - exp(ae * xi * xi + be * xi + ce);
-      Vector3d J;                                          // 雅可比矩阵
+      Eigen::Vector3d J;                                   // 雅可比矩阵
       J[0] = -xi * xi * exp(ae * xi * xi + be * xi + ce);  // de/da
       J[1] = -xi * exp(ae * xi * xi + be * xi + ce);       // de/db
       J[2] = -exp(ae * xi * xi + be * xi + ce);            // de/dc
@@ -55,15 +53,15 @@ int main(int argc, char **argv) {
     }
 
     // 求解线性方程 Hx=b
-    Vector3d dx = H.ldlt().solve(b);
-    if (isnan(dx[0])) {
-      cout << "result is nan!" << endl;
+    Eigen::Vector3d dx = H.ldlt().solve(b);
+    if (std::isnan(dx[0])) {
+      std::cout << "result is nan!" << std::endl;
       break;
     }
 
     if (iter > 0 && cost >= lastCost) {
-      cout << "cost: " << cost << ">= last cost: " << lastCost << ", break."
-           << endl;
+      std::cout << "cost: " << cost << ">= last cost: " << lastCost
+                << ", break." << std::endl;
       break;
     }
 
@@ -73,15 +71,18 @@ int main(int argc, char **argv) {
 
     lastCost = cost;
 
-    cout << "total cost: " << cost << ", \t\tupdate: " << dx.transpose()
-         << "\t\testimated params: " << ae << "," << be << "," << ce << endl;
+    std::cout << "total cost: " << cost << ", \t\tupdate: " << dx.transpose()
+              << "\t\testimated params: " << ae << "," << be << "," << ce
+              << std::endl;
   }
 
-  chrono::steady_clock::time_point t2 = chrono::steady_clock::now();
-  chrono::duration<double> time_used =
-      chrono::duration_cast<chrono::duration<double>>(t2 - t1);
-  cout << "solve time cost = " << time_used.count() << " seconds. " << endl;
+  std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+  std::chrono::duration<double> time_used =
+      std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+  std::cout << "solve time cost = " << time_used.count() << " seconds. "
+            << std::endl;
 
-  cout << "estimated abc = " << ae << ", " << be << ", " << ce << endl;
+  std::cout << "estimated abc = " << ae << ", " << be << ", " << ce
+            << std::endl;
   return 0;
 }
