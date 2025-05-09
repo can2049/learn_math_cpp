@@ -14,8 +14,8 @@ int main(int argc, char **argv) {
   double ar = 1.0, br = 2.0, cr = 1.0;   // 真实参数值
   double ae = 5.0, be = -5.0, ce = 5.0;  // 估计参数值
   int N = 200;                           // 数据点
-  double w_sigma = 1.0;                  // 噪声Sigma值
-  double inv_sigma = 1.5 / w_sigma;
+  double w_sigma = 1.5;                  // 噪声Sigma值
+  double inv_sigma = 1.0 / w_sigma;
 
   std::mt19937 gen(std::random_device{}());
   std::normal_distribution<> dist(0, w_sigma);
@@ -35,8 +35,8 @@ int main(int argc, char **argv) {
 
   std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
   for (int iter = 0; iter < iterations; iter++) {
-    Eigen::Matrix3d H =
-        Eigen::Matrix3d::Zero();  // Hessian = J^T W^{-1} J in Gauss-Newton
+    // Hessian = J^T W^{-1} J in Gauss-Newton
+    Eigen::Matrix3d H = Eigen::Matrix3d::Zero();
     Eigen::Vector3d b = Eigen::Vector3d::Zero();  // bias
     cost = 0;
 
