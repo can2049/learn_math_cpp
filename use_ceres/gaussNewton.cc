@@ -20,11 +20,13 @@ int main(int argc, char **argv) {
   std::mt19937 gen(std::random_device{}());
   std::normal_distribution<> dist(0, w_sigma);
 
-  std::vector<double> x_data, y_data;  // 数据
+  std::vector<double> x_data, y_data, y_true_data;  // 数据
   for (int i = 0; i < N; i++) {
     double x = 1.0 * i / N;
     x_data.push_back(x);
-    y_data.push_back(exp(ar * x * x + br * x + cr) + dist(gen));  // 添加噪声
+    auto y = exp(ar * x * x + br * x + cr);  // 真实值
+    y_true_data.push_back(y);
+    y_data.push_back(y + dist(gen));  // 添加噪声
   }
 
   // 开始Gauss-Newton迭代
@@ -84,5 +86,40 @@ int main(int argc, char **argv) {
 
   std::cout << "estimated abc = " << ae << ", " << be << ", " << ce
             << std::endl;
+
+  // print data to file
+  std::string data_file = "/tmp/gauss_newton_data_delete_me.txt";
+
+  std::ofstream fout(data_file);
+
+  for (int i = 0; i < N; i++) {
+    // x, y, y_true, y_fit
+    double y_fit = exp(ae * x_data[i] * x_data[i] + be * x_data[i] + ce);
+    fout << std::setprecision(10) << x_data[i] << " " << y_data[i] << " "
+         << y_true_data[i] << " " << y_fit << std::endl;
+  }
+  fout.close();
+
+  // use gnuplot to plot
+  std::string plot_script = "/tmp/gnuplot_plot_curve_delete_me.gp";
+  std::ofstream gp(plot_script);
+  gp << "set xlabel 'x'\n";
+  gp << "set ylabel 'y'\n";
+  gp << "set title 'Gauss-Newton Curve Fitting'\n";
+  gp << "plot '" << data_file
+     << "' using 1:2 title 'data' with points pt 7 ps 0.5, "
+        "'"
+     << data_file << "' using 1:3 title 'true' with lines lw 2, '" << data_file
+     << "' using 1:4 title 'fit' with lines lw 2\n";
+  gp << "pause -1\n";  // 按任意键关闭
+  gp.close();
+  std::string cmd = "gnuplot " + plot_script;
+  std::system(cmd.c_str());
+  std::cout << "Data file: " << data_file << std::endl;
+  std::cout << "Gnuplot script: " << plot_script << std::endl;
+  // 可选：删除临时文件
+  // std::remove(data_file.c_str());
+  // std::remove(plot_script.c_str());
+
   return 0;
 }
