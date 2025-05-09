@@ -23,18 +23,20 @@ struct CURVE_FITTING_COST {
 
 int main(int argc, char** argv) {
   double ar = 1.0, br = 2.0, cr = 1.0;   // 真实参数
-  double ae = 2.0, be = -1.0, ce = 5.0;  // 初始估计值
-  int N = 100;
-  double w_sigma = 1.0;
+  double ae = 5.0, be = -5.0, ce = 5.0;  // 初始估计值
+  int N = 200;
+  double w_sigma = 1.5;
 
   std::mt19937 gen(std::random_device{}());
   std::normal_distribution<> dist{0, w_sigma};
 
-  std::vector<double> x_data, y_data;
+  std::vector<double> x_data, y_data, y_data_true;
   for (int i = 0; i < N; ++i) {
-    double x = i / 100.0;
+    double x = 1.0 * i / N;
     x_data.push_back(x);
-    y_data.push_back(exp(ar * x * x + br * x + cr) + dist(gen));
+    auto y = exp(ar * x * x + br * x + cr);
+    y_data_true.push_back(y);
+    y_data.push_back(y + dist(gen));
   }
 
   double abc[3] = {ae, be, ce};
@@ -42,16 +44,16 @@ int main(int argc, char** argv) {
   // 构建最小二乘问题
   ceres::Problem problem;
   for (int i = 0; i < N; ++i) {
-    problem.AddResidualBlock(
-        new ceres::AutoDiffCostFunction<CURVE_FITTING_COST, 1, 3>(
-            new CURVE_FITTING_COST(x_data[i], y_data[i])),
-        nullptr, abc);
+    auto* functor = new CURVE_FITTING_COST(x_data[i], y_data[i]);
+    auto* cost_function =
+        new ceres::AutoDiffCostFunction<CURVE_FITTING_COST, 1, 3>(functor);
+    problem.AddResidualBlock(cost_function, nullptr, abc);
   }
 
   // 配置求解器
   ceres::Solver::Options options;
   options.linear_solver_type = ceres::DENSE_NORMAL_CHOLESKY;
-  options.minimizer_progress_to_stdout = false;
+  options.minimizer_progress_to_stdout = true;
 
   ceres::Solver::Summary summary;
   auto t1 = std::chrono::steady_clock::now();
@@ -68,7 +70,7 @@ int main(int argc, char** argv) {
   const std::string data_file = "/tmp/ceres_curve_data_delete_me.txt";
   std::ofstream fout(data_file);
   for (int i = 0; i < N; ++i) {
-    double y_true = exp(ar * x_data[i] * x_data[i] + br * x_data[i] + cr);
+    double y_true = y_data_true[i];
     double y_fit =
         exp(abc[0] * x_data[i] * x_data[i] + abc[1] * x_data[i] + abc[2]);
     fout << x_data[i] << " " << y_data[i] << " " << y_true << " " << y_fit
