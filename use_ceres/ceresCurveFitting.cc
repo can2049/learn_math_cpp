@@ -4,7 +4,9 @@
 #include <cmath>
 #include <cstdlib>  // for std::system
 #include <fstream>
+#include <iomanip>  // for std::setprecision, std::scientific
 #include <iostream>
+#include <limits>  // for std::numeric_limits
 #include <random>
 #include <vector>
 
@@ -28,7 +30,7 @@ int main(int argc, char** argv) {
   double w_sigma = 1.5;
 
   std::mt19937 gen(std::random_device{}());
-  std::normal_distribution<> dist{0, w_sigma};
+  std::normal_distribution<> dist(0, w_sigma);
 
   std::vector<double> x_data, y_data, y_data_true;
   for (int i = 0; i < N; ++i) {
@@ -62,7 +64,7 @@ int main(int argc, char** argv) {
 
   std::chrono::duration<double> time_used = t2 - t1;
   std::cout << "solve time cost = " << time_used.count() << " seconds.\n";
-  std::cout << summary.BriefReport() << std::endl;
+  std::cout << " solve report: " << summary.BriefReport() << std::endl;
   std::cout << "estimated a,b,c = " << abc[0] << " " << abc[1] << " " << abc[2]
             << "\n";
 
@@ -73,8 +75,8 @@ int main(int argc, char** argv) {
     double y_true = y_data_true[i];
     double y_fit =
         exp(abc[0] * x_data[i] * x_data[i] + abc[1] * x_data[i] + abc[2]);
-    fout << x_data[i] << " " << y_data[i] << " " << y_true << " " << y_fit
-         << "\n";
+    fout << std::setprecision(10) << x_data[i] << " " << y_data[i] << " "
+         << y_true << " " << y_fit << "\n";
   }
   fout.close();
 
