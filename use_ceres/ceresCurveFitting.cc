@@ -95,6 +95,10 @@ int main(int argc, char** argv) {
   std::string cmd = "gnuplot " + plot_script;
   std::system(cmd.c_str());
 
+  // print temp file name
+  std::cout << "Data file: " << data_file << std::endl;
+  std::cout << "Gnuplot script: " << plot_script << std::endl;
+
   // 可选：删除临时文件
   // std::remove(data_file.c_str());
   // std::remove(plot_script.c_str());
