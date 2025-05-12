@@ -37,5 +37,9 @@ include_directories(${CERES_INCLUDE_DIRS})
 # find_package(G2O REQUIRED)
 # include_directories(${G2O_INCLUDE_DIRS})
 
+find_package(Sophus REQUIRED)
+
+
 add_subdirectory(gnuplot_demo)
 add_subdirectory(use_ceres)
+add_subdirectory(use_sophus)
