@@ -53,8 +53,7 @@ function download_install_ceres() {
     mkdir -p build
     cd build
     cmake ${CMAKE_COMMON_OPTIONS} ..
-    make -j${JOB_NUM}
-    make install
+    make install -j${JOB_NUM}
 }
 
 function download_install_eigen() {
@@ -73,11 +72,30 @@ function download_install_eigen() {
     mkdir -p build
     cd build
     cmake ${CMAKE_COMMON_OPTIONS} ..
-    make -j${JOB_NUM}
-    make install
+    make install -j${JOB_NUM}
+}
+
+function download_install_sophus() {
+    echo "===== download_install_sophus ====="
+    local tag=1.22.10
+    cd ${DOWNLOAD_DIR}
+    # if dir not exist, clone it
+    if [ ! -d Sophus ]; then
+        git clone --depth 1 -b ${tag} https://github.com/strasdat/Sophus.git
+        cd Sophus
+    else
+        cd Sophus
+        git fetch --depth 1 origin tag ${tag}
+        git reset --hard tags/${tag}
+    fi
+    mkdir -p build
+    cd build
+    cmake ${CMAKE_COMMON_OPTIONS} ..
+    make install -j${JOB_NUM}
 }
 
 ################
 
-download_install_ceres
 download_install_eigen
+download_install_ceres
+download_install_sophus
