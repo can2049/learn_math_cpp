@@ -25,7 +25,7 @@ find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIRS})
 
 # Ceres
-find_package(Ceres REQUIRED HINTS ${CMAKE_PREFIX_PATH} ${CMAKE_MODULE_PATH})
+find_package(Ceres REQUIRED HINTS )
 include_directories(${CERES_INCLUDE_DIRS})
 
 # # glog
@@ -37,7 +37,10 @@ include_directories(${CERES_INCLUDE_DIRS})
 # find_package(G2O REQUIRED)
 # include_directories(${G2O_INCLUDE_DIRS})
 
+
 find_package(Sophus REQUIRED)
+include_directories( ${Sophus_INCLUDE_DIRS} )
+message(STATUS "Sophus_INCLUDE_DIRS = ${Sophus_INCLUDE_DIRS}")
 
 
 add_subdirectory(gnuplot_demo)
