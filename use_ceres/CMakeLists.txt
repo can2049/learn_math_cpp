@@ -5,3 +5,6 @@ target_link_libraries(ceresCurveFitting PRIVATE ${CERES_LIBRARIES}  ceres )
 
 
 add_executable(gaussNewton gaussNewton.cc)
+
+add_executable(hello_ceres hello_ceres.cc)
+target_link_libraries(hello_ceres PRIVATE ${CERES_LIBRARIES}  ceres )
