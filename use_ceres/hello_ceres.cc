@@ -8,6 +8,7 @@
 #include <iostream>
 #include <limits>  // for std::numeric_limits
 #include <random>
+#include <typeindex>
 #include <vector>
 
 struct CostFunctor {
@@ -16,12 +17,17 @@ struct CostFunctor {
     residual[0] = 10.0 - x[0];
     return true;
   }
+
+  ~CostFunctor() {
+    // Destructor implementation
+    std::cout << __func__ << " called" << std::endl;
+  }
 };
 int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
 
   // The variable to solve for with its initial value.
-  double initial_x = 5.0;
+  constexpr double initial_x = 50.0;
   double x = initial_x;
 
   // Build the problem.
