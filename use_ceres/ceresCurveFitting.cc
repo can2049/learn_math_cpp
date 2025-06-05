@@ -11,9 +11,9 @@
 #include <vector>
 
 // 曲线拟合的代价函数
-struct CURVE_FITTING_COST {
+struct CurveFittingCostFunctor {
   double x, y;
-  CURVE_FITTING_COST(double x, double y) : x(x), y(y) {}
+  CurveFittingCostFunctor(double x, double y) : x(x), y(y) {}
 
   template <typename T>
   bool operator()(const T* const abc, T* residual) const {
@@ -46,9 +46,9 @@ int main(int argc, char** argv) {
   // 构建最小二乘问题
   ceres::Problem problem;
   for (int i = 0; i < N; ++i) {
-    auto* functor = new CURVE_FITTING_COST(x_data[i], y_data[i]);
+    auto* functor = new CurveFittingCostFunctor(x_data[i], y_data[i]);
     auto* cost_function =
-        new ceres::AutoDiffCostFunction<CURVE_FITTING_COST, 1, 3>(functor);
+        new ceres::AutoDiffCostFunction<CurveFittingCostFunctor, 1, 3>(functor);
     problem.AddResidualBlock(cost_function, nullptr, abc);
   }
 
